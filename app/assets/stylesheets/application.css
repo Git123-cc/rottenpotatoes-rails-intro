@@ -17,3 +17,11 @@
  table#movies th.hilite {
   background-color: yellow;
 }
+
+h2 {
+  color: maroon;
+}
+
+#colmsg {
+  color: red;
+}
