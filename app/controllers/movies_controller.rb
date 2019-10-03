@@ -12,22 +12,30 @@ class MoviesController < ApplicationController
 
   def index
     @all_ratings = Movie.ratings
-    @sort = params[:sort]
-    @t_param = params[:ratings]
-
-    if @t_param.nil?
-      @all_ratings.each do |ra|
-        (@t_param ||={})[ra] = 1
-      end
-      t_param = @all_ratings
-    else
-      t_param = @t_param.keys
+    if params[:sort]
+      @sort = params[:sort]
+    elsif session[:sort]
+      @sort = session[:sort]
     end
-
+      
+    if params[:ratings]
+      @t_param = params[:ratings]
+    elsif session[:ratings]
+      @t_param = session[:ratings]
+    end
     
-    # session[:sort] = @sort
-    # session[:ratings] = @t_param
-    @movies = Movie.where(rating: t_param).order(@sort)
+    if params[:sort].nil? and !(session[:sort].nil?) or (params[:ratings].nil? and !(session[:ratings].nil?)) 
+      redirect_to movies_path(:sort => @sort, :ratings => @t_param)
+    end
+    
+    if session[:ratings]
+      @chosen = session[:ratings].keys
+    else
+      @chosen = @all_ratings
+    end
+    @movies = Movie.order(@sort).where(rating: @chosen)
+    session[:sort] = @sort
+    session[:ratings] = @t_param
     # if (params[:sort].nil? and !(session[:sort].nil?)) or (params[:ratings].nil? and !(session[:ratings].nil?))
     #   flash.keep
     #   redirect_to movies_path(sort: session[:sort],ratings: session[:ratings])
